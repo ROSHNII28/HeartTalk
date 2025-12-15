@@ -9,16 +9,25 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   // 🔥 Save notification token in backend after login
-  const handleLoginSuccess = async (userId) => {
-    const token = await requestNotificationPermission();
-    if (token) {
-      await fetch("http://localhost:8080/saveToken", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, token }),
-      });
+// 🔥 Save notification token in backend after login
+const handleLoginSuccess = async (userId) => {
+  const token = await requestNotificationPermission();
+  if (token) {
+    try {
+    await fetch("https://hearttalk-3.onrender.com/saveToken", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId, token }),
+});
+
+
+
+      console.log("Token saved successfully!");
+    } catch (err) {
+      console.error("Error saving token:", err);
     }
-  };
+  }
+};
 
   const handleLogin = async (e) => {
     e.preventDefault();

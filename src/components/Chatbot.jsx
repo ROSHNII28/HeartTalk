@@ -1,193 +1,136 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi ! 💗 I’m here for you. What’s on your mind today?" }
+    { sender: "bot", text: "Hi 💖 I’m here for you. How are you feeling today?" }
   ]);
   const [input, setInput] = useState("");
-  const canvasRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const API_KEY = "AIzaSyD4xzFUm1RWcabRClibnAMTreIn1f3s19g";
+  // Auto scroll
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     setMessages(prev => [...prev, { sender: "user", text: input }]);
-    const userMessage = input;
     setInput("");
-
-    setMessages(prev => [...prev, { sender: "bot", text: "Thinking..." }]);
-
-    const reply = await getGeminiResponse(userMessage);
-
-    setMessages(prev => {
-      const filtered = prev.filter(m => m.text !== "Thinking...");
-      return [...filtered, { sender: "bot", text: reply }];
-    });
-  };
-
-  // 💗 EMOTIONAL AI FUNCTION — FIXED FOR GEMINI 2.5 FLASH
-  async function getGeminiResponse(prompt) {
-    const emotionalSystemPrompt = `
-You are an emotional-support chatbot named HeartTalk.
-Your tone is warm, gentle, soft and caring.
-You never give technical, factual, or logical explanations.
-You ONLY focus on emotions, comfort, validation, empathy, and encouragement.
-You speak like a loving, supportive friend who truly listens.
-If the user asks for anything non-emotional, gently bring the conversation back to feelings.
-Always respond with kindness, empathy, and soft emotional support.
-    `;
+    setLoading(true);
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: emotionalSystemPrompt + "\nUser: " + prompt
-                  }
-                ]
-              }
-            ]
-          })
-        }
-      );
+      const res = await fetch("http://localhost:5050/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input })
+      });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      return (
-        data.candidates?.[0]?.content?.parts?.[0]?.text ||
-        "I’m here with you ❤️ Tell me what you're feeling."
-      );
-    } catch (err) {
-      console.error(err);
-      return "Something went wrong 💗 but I'm right here with you.";
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: data.reply || "No reply 😶" }
+      ]);
+    } catch (error) {
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "Connection error 😢" }
+      ]);
     }
-  }
+
+    setLoading(false);
+  };
 
   return (
-    <div className="chat-main">
-      <header className="chat-header">
-        <h2> 💗 HeartTalk AI</h2>
-      </header>
+    <div style={{
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      background: "linear-gradient(135deg, #fce4f8, #fef6fb)",
+      fontFamily: "'Poppins', sans-serif",
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: "20px",
+        textAlign: "center",
+        fontWeight: 600,
+        fontSize: 22,
+        color: "#6b21a8",
+        background: "#f2d7f5",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+      }}>
+        💜 HeartTalk Chat
+      </div>
 
-      <div className="chat-box">
+      {/* Chat Messages */}
+      <div style={{
+        flex: 1,
+        padding: 20,
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}>
         {messages.map((msg, i) => (
-          <div key={i} className={`msg ${msg.sender}`}>
+          <div key={i} style={{
+            alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
+            background: msg.sender === "user" ? "#e0c3fc" : "#f8d3f5",
+            color: "#4b0082",
+            padding: "12px 18px",
+            borderRadius: 25,
+            maxWidth: "70%",
+            wordBreak: "break-word",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          }}>
             {msg.text}
           </div>
         ))}
+        {loading && (
+          <div style={{ color: "#6b21a8" }}>💬 Bot is typing...</div>
+        )}
+        <div ref={chatEndRef} />
       </div>
 
-      <footer className="chat-footer">
-        <textarea
-          placeholder="Share your thoughts..."
+      {/* Input Area */}
+      <div style={{
+        display: "flex",
+        padding: 15,
+        gap: 10,
+        background: "#f2d7f5",
+        borderTop: "1px solid #e0c3fc",
+      }}>
+        <input
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && (e.preventDefault(), sendMessage())}
+          onKeyDown={e => e.key === "Enter" && sendMessage()}
+          placeholder="Type your message..."
+          style={{
+            flex: 1,
+            padding: "12px 15px",
+            borderRadius: 25,
+            border: "1px solid #e0c3fc",
+            outline: "none",
+            fontSize: 15,
+          }}
         />
-        <button onClick={sendMessage}>Send 💬</button>
-      </footer>
-
-      <style>{`
-        .chat-main {
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          background: linear-gradient(180deg, #fde7f3, #fff);
-          font-family: 'Poppins', sans-serif;
-        }
-
-        .chat-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 18px;
-          background: #ffffffcc;
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid #f2c6df;
-        }
-
-        .chat-box {
-          flex: 1;
-          overflow-y: auto;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .msg {
-          max-width: 75%;
-          padding: 12px 18px;
-          border-radius: 20px;
-          font-size: 0.95rem;
-          line-height: 1.4;
-          animation: fadeIn .3s ease;
-        }
-
-        .msg.user {
-          align-self: flex-end;
-          background: #ffd1e8;
-          color: #6b2f50;
-          border-bottom-right-radius: 8px;
-        }
-
-        .msg.bot {
-          align-self: flex-start;
-          background: #e1d0ff;
-          color: #4b2ba8;
-          border-bottom-left-radius: 8px;
-        }
-
-        .chat-footer {
-          display: flex;
-          gap: 10px;
-          padding: 15px;
-          background: #ffffffee;
-          border-top: 1px solid #f2c6df;
-        }
-
-        textarea {
-          flex: 1;
-          resize: none;
-          border-radius: 15px;
-          padding: 12px 16px;
-          border: 1px solid #dfb1cc;
-          background: #fff;
-          font-size: 1rem;
-          outline: none;
-        }
-
-        textarea:focus {
-          border-color: #ef5da8;
-          box-shadow: 0 0 5px rgba(255, 105, 180, 0.4);
-        }
-
-        button {
-          padding: 0 20px;
-          border: none;
-          border-radius: 15px;
-          background: linear-gradient(90deg, #ff8fb1, #ef5da8);
-          color: white;
-          font-weight: 600;
-          cursor: pointer;
-        }
-
-        button:hover {
-          opacity: 0.9;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+          style={{
+            padding: "12px 20px",
+            borderRadius: 25,
+            background: "#a855f7",
+            color: "#fff",
+            border: "none",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "..." : "Send"}
+        </button>
+      </div>
     </div>
   );
 }

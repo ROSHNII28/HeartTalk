@@ -12,28 +12,29 @@ export default function RelaxingMusic() {
     {
       name: 'Nature Sounds',
       sounds: [
-        { id: 1, name: 'Rain', emoji: '🌧️', description: 'Gentle rain sounds', duration: '30:00', src: '/src/Public/Rain.mp3.mp3' },
-        { id: 2, name: 'Ocean Waves', emoji: '🌊', description: 'Calming ocean waves', duration: '45:00', src: '/src/Public/ocean.mp3' },
-         { id: 3, name: 'Bird', emoji: '🐦', description: 'Soothing morning bird chirps', duration: '30:00', src: '/src/Public/bird.mp3' }
+        { id: 1, name: 'Rain', emoji: '🌧️', description: 'Gentle rain sounds', duration: '30:00', src: '/Rain.mp3' },
+        { id: 2, name: 'Ocean Waves', emoji: '🌊', description: 'Calming ocean waves', duration: '45:00', src: '/ocean.mp3' },
+        { id: 3, name: 'Bird', emoji: '🐦', description: 'Soothing morning bird chirps', duration: '30:00', src: '/bird.mp3' }
       ]
     },
     {
       name: 'Ambient & Meditation',
       sounds: [
-        { id: 4, name: 'Tibetan Bowls', emoji: '🎵', description: 'Healing singing bowl vibrations', duration: '25:00', src: '/src/Public/tibetainbowl.mp3.mp3' },
-        { id: 5, name: 'Wind Chimes', emoji: '🎐', description: 'Gentle wind chimes melody', duration: '35:00', src: '/src/Public/wind-chimes.mp3.mp3' },
-        { id: 6, name: 'Meditation', emoji: '🧘', description: 'Calm and deep meditation ambience', duration: '35:00', src: '/src/Public/meditation.mp3' }
+        { id: 4, name: 'Tibetan Bowls', emoji: '🎵', description: 'Healing singing bowl vibrations', duration: '25:00', src: '/tibetainbowl.mp3' },
+        { id: 5, name: 'Wind Chimes', emoji: '🎐', description: 'Gentle wind chimes melody', duration: '35:00', src: '/wind-chimes.mp3' },
+        { id: 6, name: 'Meditation', emoji: '🧘', description: 'Calm and deep meditation ambience', duration: '35:00', src: '/meditation.mp3' }
       ]
     },
     {
       name: 'Cozy & Comfort',
       sounds: [
-        { id: 7, name: 'Fireplace', emoji: '🔥', description: 'Crackling fireplace warmth', duration: '60:00', src: '/src/Public/fire.mp3' },
-        { id: 8, name: 'Coffee Shop', emoji: '☕', description: 'Ambient cafe atmosphere', duration: '45:00', src: '/src/Public/coffee.mp3' },
-        { id: 9, name: 'Night Crickets', emoji: '🦗', description: 'Peaceful cricket sounds at night', duration: '55:00', src: '/src/Public/night.mp3' }
+        { id: 7, name: 'Fireplace', emoji: '🔥', description: 'Crackling fireplace warmth', duration: '60:00', src: '/fire.mp3' },
+        { id: 8, name: 'Coffee Shop', emoji: '☕', description: 'Ambient cafe atmosphere', duration: '45:00', src: '/coffee.mp3' },
+        { id: 9, name: 'Night Crickets', emoji: '🦗', description: 'Peaceful cricket sounds at night', duration: '55:00', src: '/night.mp3' }
       ]
     }
   ];
+  
 
   const currentSound = soundCategories
     .flatMap(c => c.sounds)
